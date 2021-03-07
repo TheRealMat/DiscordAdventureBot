@@ -1,60 +1,46 @@
 ﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 namespace DiscordBot
 {
-    class Bot
-    {
-        public DiscordClient client { get; private set; }
-        public CommandsNextExtension Commands { get; private set; }
+	class Bot
+	{
+		public DiscordClient client { get; private set; }
+		public CommandsNextExtension Commands { get; private set; }
 
-        public async Task RunAsync()
-        {
-            var json = string.Empty;
-            using (var fs = File.OpenRead("config.json")){
-                using (var sr = new StreamReader(fs, new UTF8Encoding(false))){
-                    json = await sr.ReadToEndAsync().ConfigureAwait(false);
-                }
-            }
+		public async Task RunAsync()
+		{
+			var config = Config.Instance;
 
-            var configJson = JsonConvert.DeserializeObject<ConfigJson>(json);
+			client = new DiscordClient(new DiscordConfiguration
+			{
+				Token = config.getConfig().Token,
+				TokenType = TokenType.Bot,
+				AutoReconnect = true,
+				MinimumLogLevel = LogLevel.Debug
+			});
 
-            var config = new DiscordConfiguration
-            {
-                Token = configJson.Token,
-                TokenType = TokenType.Bot,
-                AutoReconnect = true,
-                MinimumLogLevel = LogLevel.Debug
-            };
+			client.Ready += OnClientReady;
 
-            client = new DiscordClient(config);
+			var commandsConfig = new CommandsNextConfiguration
+			{
+				StringPrefixes = new string[] { config.getConfig().Prefix },
+				EnableDms = false,
+				EnableMentionPrefix = true
+			};
 
-            client.Ready += OnClientReady;
+			Commands = client.UseCommandsNext(commandsConfig);
 
-            var commandsConfig = new CommandsNextConfiguration
-            {
-                StringPrefixes = new string[] { configJson.Prefix },
-                EnableDms = false,
-                EnableMentionPrefix = true
-            };
+			await client.ConnectAsync();
 
-            Commands = client.UseCommandsNext(commandsConfig);
+			await Task.Delay(-1);
+		}
 
-            await client.ConnectAsync();
-
-            await Task.Delay(-1);
-        }
-
-        private Task OnClientReady(object sender, ReadyEventArgs e)
-        {
-            return Task.CompletedTask;
-        }
-    }
+		private Task OnClientReady(object sender, ReadyEventArgs e)
+		{
+			return Task.CompletedTask;
+		}
+	}
 }
