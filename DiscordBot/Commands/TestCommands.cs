@@ -1,5 +1,6 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +15,22 @@ namespace DiscordBot.Commands
         public async Task Test(CommandContext ctx)
         {
             await ctx.Channel.SendMessageAsync("fuck you").ConfigureAwait(false);
+        }
+
+        [Command("emojis")]
+        [Description("Returns all emojis in guild")]
+        public async Task Emojis(CommandContext ctx)
+        {
+            IEnumerable<DiscordEmoji> emojis;
+            emojis = ctx.Guild.Emojis.Values;
+            string message = "";
+
+            foreach (DiscordEmoji emoji in emojis)
+            {
+                message += emoji.ToString();
+            }
+
+            await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
         }
 
         [Command("roll")]
