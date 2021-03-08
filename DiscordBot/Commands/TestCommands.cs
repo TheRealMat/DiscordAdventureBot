@@ -17,6 +17,13 @@ namespace DiscordBot.Commands
             await ctx.Channel.SendMessageAsync("fuck you").ConfigureAwait(false);
         }
 
+        [Command("powerlich")]
+        [Description("Returns a powerlich")]
+        public async Task Powerlich(CommandContext ctx)
+        {
+            await ctx.Channel.SendMessageAsync("<:powerlich:818391341163348008>").ConfigureAwait(false);
+        }
+
         [Command("emojis")]
         [Description("Returns all emojis in guild")]
         public async Task Emojis(CommandContext ctx)
