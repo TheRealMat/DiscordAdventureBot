@@ -4,6 +4,7 @@ using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
@@ -52,24 +53,54 @@ namespace DiscordBot.Commands
 			}
 
 			Random random = new Random();
-			string message = "";
+
+			string diceNotation = $"{numberOfDie}d{dieFaces}";
+			string message = $"Rolling {diceNotation} die\n[";
 			int total = 0;
+
+			// Throws each dice and sums the values
 			for (int i = 0; i < numberOfDie; i++)
 			{
 				int diceroll = random.Next(1, dieFaces + 1);
 				total += diceroll;
 				message += diceroll.ToString();
-				// Formatting. The last ',' will be omitted from the output
-				if (i != numberOfDie - 1)
-				{
-					message += ", ";
-				}
+				// Formatting. The last ',' will be omitted from the output. Will instead get a ']' to symbolize end of the rolls
+				message += i != numberOfDie - 1 ? ", " : "]";
 			}
-			message += Environment.NewLine;
-			message += "Total: ";
-			message += total.ToString();
+
+
+			// Prints the total
+			message += $"\n\nTotal: {total}";
 
 			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
+		}
+
+		[Command("roll")]
+		[Description("rolls custom dice")]
+		public async Task Roll(CommandContext ctx, [Description("Die notation")] string diceNotation = "1d6")
+		{
+
+			// Matches <digit>d<digit> i.e. that this '1d6' pattern is found
+			Regex rx = new Regex(@"^\d+d\d+$",
+					RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+
+			MatchCollection matches = rx.Matches(diceNotation);
+
+			// No matches so exit
+			if (matches.Count == 0)
+				return;
+
+			// Basic: We only care about the first one
+			string match = matches[0].Value;
+
+			string[] diceData = match.Split("d");
+
+			// No need for try catch. Input has already been verified
+			int numberOfDie = int.Parse(diceData[0]);
+			int dieFaces = int.Parse(diceData[1]);
+
+			await Roll(ctx, dieFaces, numberOfDie);
 		}
 	}
 }
