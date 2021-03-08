@@ -123,12 +123,9 @@ namespace DiscordBot.Commands
 		}
 
 		[Command("wormhole")]
-		[Description("Wormhole service")]
-		public async Task Wormhole(CommandContext ctx, params string[] message)
+		public async Task Wormhole(CommandContext ctx, [Description("The message that will be sent into the wormhole")] params string[] message)
 		{
-
 			WormholeQueue.Enqueue(string.Join(" ", message));
-
 		}
 	}
 }
