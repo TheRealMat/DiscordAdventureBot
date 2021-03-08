@@ -42,7 +42,7 @@ namespace DiscordBot.Commands
 		}
 
 		[Command("roll")]
-		[Description("rolls custom dice")]
+		[Description("Rolls custom dice")]
 		public async Task Roll(CommandContext ctx, [Description("Die face amount")] int dieFaces = 6, [Description("Die amount (max 100)")] int numberOfDie = 1)
 		{
 
@@ -76,7 +76,7 @@ namespace DiscordBot.Commands
 		}
 
 		[Command("roll")]
-		[Description("rolls custom dice")]
+		[Description("Rolls custom dice")]
 		public async Task Roll(CommandContext ctx, [Description("Die notation")] string diceNotation = "1d6")
 		{
 
@@ -103,6 +103,32 @@ namespace DiscordBot.Commands
 			int dieFaces = int.Parse(diceData[1]);
 
 			await Roll(ctx, dieFaces, numberOfDie);
+		}
+
+
+		/* Wormhole section */
+		Queue<string> WormholeQueue = new Queue<string>();
+
+		[Command("wormhole")]
+		[Description("Wormhole service")]
+		public async Task Wormhole(CommandContext ctx)
+		{
+
+			if (WormholeQueue.Count == 0)
+				return;
+
+			string message = WormholeQueue.Dequeue();
+
+			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
+		}
+
+		[Command("wormhole")]
+		[Description("Wormhole service")]
+		public async Task Wormhole(CommandContext ctx, params string[] message)
+		{
+
+			WormholeQueue.Enqueue(string.Join(" ", message));
+
 		}
 	}
 }
