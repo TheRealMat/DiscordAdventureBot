@@ -32,7 +32,7 @@ namespace DiscordBot
 				StringPrefixes = new string[] { config.getConfig().Prefix },
 				EnableDms = false,
 				//IgnoreExtraArguments = false,
-				EnableMentionPrefix = true
+				EnableMentionPrefix = true,
 			};
 
 			Commands = client.UseCommandsNext(commandsConfig);

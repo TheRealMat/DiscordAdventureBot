@@ -80,6 +80,8 @@ namespace DiscordBot.Commands
 		public async Task Roll(CommandContext ctx, [Description("Die notation")] string diceNotation = "1d6")
 		{
 
+			diceNotation = diceNotation.ToLower();
+
 			// Matches <digit>d<digit> i.e. that this '1d6' pattern is found
 			Regex rx = new Regex(@"^\d+d\d+$",
 					RegexOptions.Compiled | RegexOptions.IgnoreCase);
