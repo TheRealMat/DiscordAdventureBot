@@ -42,25 +42,25 @@ namespace DiscordBot.Commands
 
 		[Command("roll")]
 		[Description("rolls custom dice")]
-		public async Task Roll(CommandContext ctx, [Description("Die face amount")] int faces, [Description("Die amount")] int number)
+		public async Task Roll(CommandContext ctx, [Description("Die face amount")] int dieFaces = 6, [Description("Die amount (max 100)")] int numberOfDie = 1)
 		{
 
 			// Will not throw more than 100 dices
-			if (number > 100)
+			if (numberOfDie > 100)
 			{
-				number = 100;
+				numberOfDie = 100;
 			}
 
 			Random random = new Random();
 			string message = "";
 			int total = 0;
-			for (int i = 0; i < number; i++)
+			for (int i = 0; i < numberOfDie; i++)
 			{
-				int diceroll = random.Next(1, faces + 1);
+				int diceroll = random.Next(1, dieFaces + 1);
 				total += diceroll;
 				message += diceroll.ToString();
 				// Formatting. The last ',' will be omitted from the output
-				if (i != number - 1)
+				if (i != numberOfDie - 1)
 				{
 					message += ", ";
 				}
