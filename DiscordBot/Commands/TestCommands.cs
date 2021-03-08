@@ -15,7 +15,7 @@ namespace DiscordBot.Commands
 		[Description("Returns a message")]
 		public async Task Test(CommandContext ctx)
 		{
-			await ctx.Channel.SendMessageAsync("fuck you").ConfigureAwait(false);
+			await ctx.Channel.SendMessageAsync("https://cdn.discordapp.com/attachments/759192495782625292/818433424628121651/video0_-_2021-03-08T233110.495.mp4").ConfigureAwait(false);
 		}
 
 		[Command("powerlich")]
