@@ -6,11 +6,52 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DiscordBot.Database;
 
 namespace DiscordBot.Commands
 {
 	class TestCommands : BaseCommandModule
 	{
+		/* SQLite START */
+		[Command("sqlget")]
+		[Description("Returns a message")]
+		public async Task SQLGet(CommandContext ctx)
+		{
+			var items = SQLiteDatabaseAccess.LoadEntities();
+			string output = "";
+
+			foreach (var item in items)
+			{
+				output += $"({item.DiscordID}) Name: {item.Name} Age: {item.Age}\n";
+			}
+
+			await ctx.Channel.SendMessageAsync(output).ConfigureAwait(false);
+		}
+
+		[Command("sqlAdd")]
+		[Description("Returns a message")]
+		public async Task SQLAdd(CommandContext ctx, int age)
+		{
+			var e = new Entity();
+			e.DiscordID = ctx.User.Id.ToString();
+			e.Name = ctx.User.Username;
+			e.Age = age;
+
+			SQLiteDatabaseAccess.SaveEntity(e);
+		}
+
+		[Command("removeMe")]
+		[Description("Removed you from the sql database")]
+		public async Task SQLRemoveMe(CommandContext ctx)
+		{
+			string id = ctx.User.Id.ToString();
+
+			Console.WriteLine($"Removing a user {id}");
+			SQLiteDatabaseAccess.RemoveMe(ctx.User.Id.ToString());
+		}
+
+		/* SQL END */
+
 		[Command("test")]
 		[Description("Returns a message")]
 		public async Task Test(CommandContext ctx)
