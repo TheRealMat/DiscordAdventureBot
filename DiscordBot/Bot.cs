@@ -4,7 +4,7 @@ using DSharpPlus.EventArgs;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using DiscordBot.Commands;
-
+using System;
 
 namespace DiscordBot
 {
@@ -13,8 +13,8 @@ namespace DiscordBot
 		public DiscordClient client { get; private set; }
 		public CommandsNextExtension Commands { get; private set; }
 
-		public async Task RunAsync()
-		{
+		public Bot(IServiceProvider services)
+        {
 			var config = Config.Instance;
 
 			client = new DiscordClient(new DiscordConfiguration
@@ -33,15 +33,15 @@ namespace DiscordBot
 				EnableDms = false,
 				//IgnoreExtraArguments = false,
 				EnableMentionPrefix = true,
+				Services = services
 			};
 
 			Commands = client.UseCommandsNext(commandsConfig);
 			Commands.RegisterCommands<TestCommands>();
 
-			await client.ConnectAsync();
-
-			await Task.Delay(-1);
+			client.ConnectAsync();
 		}
+
 
 		private Task OnClientReady(object sender, ReadyEventArgs e)
 		{
