@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using DiscordBot.DAL;
 using Microsoft.EntityFrameworkCore;
 
 namespace DiscordBot
@@ -12,8 +11,7 @@ namespace DiscordBot
         {
             services.AddDbContext<RPGContext>(options =>
             {
-                options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=RPGContext;Trusted_Connection=True;MultipleActiveResultSets=true",
-                    x => x.MigrationsAssembly("DiscordBot.DAL.Migrations"));
+                options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=RPGContext;Trusted_Connection=True;MultipleActiveResultSets=true");
             });
 
 
