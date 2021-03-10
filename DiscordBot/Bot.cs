@@ -38,6 +38,7 @@ namespace DiscordBot
 
 			Commands = client.UseCommandsNext(commandsConfig);
 			Commands.RegisterCommands<TestCommands>();
+			Commands.RegisterCommands<RPGCommands>();
 
 			client.ConnectAsync();
 		}
