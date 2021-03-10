@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using DiscordBot.Services;
 
 namespace DiscordBot
 {
@@ -12,13 +13,16 @@ namespace DiscordBot
             services.AddDbContext<RPGContext>(options =>
             {
                 options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=RPGContext;Trusted_Connection=True;MultipleActiveResultSets=true");
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
 
+            services.AddScoped<IItemService, ItemService>();
 
             var serviceProvider = services.BuildServiceProvider(); // i don't know how to fix this warning
 
             Bot bot = new Bot(serviceProvider);
             services.AddSingleton(bot);
+
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
