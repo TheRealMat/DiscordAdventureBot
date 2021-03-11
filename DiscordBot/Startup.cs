@@ -17,6 +17,8 @@ namespace DiscordBot
             });
 
             services.AddScoped<IItemService, ItemService>();
+            services.AddScoped<IMapService, MapService>();
+
 
             var serviceProvider = services.BuildServiceProvider(); // i don't know how to fix this warning
 
