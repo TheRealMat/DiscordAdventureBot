@@ -92,13 +92,25 @@ namespace DiscordBot.Commands
 
 			Bitmap image1 = new Bitmap(Image.FromFile(@"Sprites\devtex.bmp"));
 
+			Bitmap[] sprites = new Bitmap[] {
+				new Bitmap(Image.FromFile(@"Sprites\devtex.bmp")),
+				new Bitmap(Image.FromFile(@"Sprites\grass.bmp"))
+			};
+
+			var random = new Random();
+
 			Bitmap[,] tiles = new Bitmap[size, size];
 
 			// Populate placeholder map
 			for (int x = 0; x < tiles.GetLength(0); x++)
 				for (int y = 0; y < tiles.GetLength(1); y++)
 				{
-					tiles[x, y] = image1;
+					// Get random image for the tile
+					var rIndex = random.Next(0, sprites.Length);
+
+					// TODO: Instead of copying, use reference to the sprite. Save memory
+					tiles[x, y] = sprites[rIndex];
+					//tiles[x, y] = image1;
 				}
 
 			// Create the graphical representation of the map based on the tiles
