@@ -84,7 +84,7 @@ namespace DiscordBot.Commands
 		public async Task CreateImage(CommandContext ctx, int size = 5)
 		{
 
-			// Limits size to 100
+			// Limits size to 100 (The image can be maximum (100^2 * 16^2) = 2,560,000 pixels. Expected max filesize of 141 kB)
 			size = size > 100 ? 100 : size;
 
 			int tileWidth = 16;
@@ -94,13 +94,14 @@ namespace DiscordBot.Commands
 
 			Bitmap[,] tiles = new Bitmap[size, size];
 
-			// populate
+			// Populate placeholder map
 			for (int x = 0; x < tiles.GetLength(0); x++)
 				for (int y = 0; y < tiles.GetLength(1); y++)
 				{
 					tiles[x, y] = image1;
 				}
 
+			// Create the graphical representation of the map based on the tiles
 			Bitmap bitmap = new Bitmap(tiles.GetLength(0) * tileWidth, tiles.GetLength(1) * tileHeight);
 			using (Graphics g = Graphics.FromImage(bitmap))
 			{
@@ -111,21 +112,18 @@ namespace DiscordBot.Commands
 					}
 			}
 
-
-			// performs 5th tier magic to transform bitmap to a byte array
+			// Transform bitmap to a byte array
 			ImageConverter converter = new ImageConverter();
 			byte[] bytes = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
 
-			// Turns the bytearray to a memoryStream
+			// Turns the bytearray into a memoryStream. A stream is required to send the message
 			Stream stream = new MemoryStream(bytes);
 
-			// Sends the message using old and ofrgotten magic
+			// Sends the message
 			await new DiscordMessageBuilder()
 				.WithContent("Nice map, Gordon")
 				.WithFile("map.png", stream)
 				.SendAsync(ctx.Channel);
-
 		}
-
 	}
 }
