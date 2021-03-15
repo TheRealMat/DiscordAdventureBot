@@ -10,9 +10,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
@@ -77,16 +76,16 @@ namespace DiscordBot.Commands
 			message += "test";
 			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
 
-
-
 			//await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
-
 
 		}
 
 		[Command("createimage")]
-		public async Task CreateImage(CommandContext ctx, int size)
+		public async Task CreateImage(CommandContext ctx, int size = 5)
 		{
+
+			// Limits size to 100
+			size = size > 100 ? 100 : size;
 
 			int tileWidth = 16;
 			int tileHeight = 16;
@@ -112,15 +111,21 @@ namespace DiscordBot.Commands
 					}
 			}
 
-			Stream stream = new MemoryStream();
 
-			bitmap.Save(stream, ImageFormat.Jpeg);
+			// performs 5th tier magic to transform bitmap to a byte array
+			ImageConverter converter = new ImageConverter();
+			byte[] bytes = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
 
-			var message = new DiscordMessageBuilder();
-			message.Content = "Nice map, Gordon";
-			message.WithFile("map.jpeg", stream);
+			// Turns the bytearray to a memoryStream
+			Stream stream = new MemoryStream(bytes);
 
-			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
+			// Sends the message using old and ofrgotten magic
+			await new DiscordMessageBuilder()
+				.WithContent("Nice map, Gordon")
+				.WithFile("map.png", stream)
+				.SendAsync(ctx.Channel);
+
 		}
+
 	}
 }
