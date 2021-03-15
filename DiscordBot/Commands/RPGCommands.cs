@@ -77,7 +77,6 @@ namespace DiscordBot.Commands
 			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
 
 			//await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
-
 		}
 
 		[Command("createimage")]
@@ -89,8 +88,6 @@ namespace DiscordBot.Commands
 
 			int tileWidth = 16;
 			int tileHeight = 16;
-
-			Bitmap image1 = new Bitmap(Image.FromFile(@"Sprites\devtex.bmp"));
 
 			Bitmap[] sprites = new Bitmap[] {
 				new Bitmap(Image.FromFile(@"Sprites\devtex.bmp")),
@@ -108,9 +105,7 @@ namespace DiscordBot.Commands
 					// Get random image for the tile
 					var rIndex = random.Next(0, sprites.Length);
 
-					// TODO: Instead of copying, use reference to the sprite. Save memory
 					tiles[x, y] = sprites[rIndex];
-					//tiles[x, y] = image1;
 				}
 
 			// Create the graphical representation of the map based on the tiles
