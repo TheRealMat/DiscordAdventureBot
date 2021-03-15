@@ -9,14 +9,16 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
 {
-    public class RPGCommands : BaseCommandModule
-    {
+	public class RPGCommands : BaseCommandModule
+	{
 		private readonly IItemService _itemService;
 		private readonly IMapService _mapService;
 
@@ -29,7 +31,7 @@ namespace DiscordBot.Commands
 		[Command("createitem")]
 		public async Task CreateItem(CommandContext ctx, string name, string description)
 		{
-			await _itemService.CreateNewItemAsync(new Item {Name = name, Description = description });
+			await _itemService.CreateNewItemAsync(new Item { Name = name, Description = description });
 		}
 
 		[Command("iteminfo")]
@@ -38,10 +40,10 @@ namespace DiscordBot.Commands
 			var item = await _itemService.GetItemByName(name).ConfigureAwait(false);
 
 			if (item == null)
-            {
+			{
 				await ctx.Channel.SendMessageAsync($"There is no item called{name}");
 				return;
-            }
+			}
 
 			await ctx.Channel.SendMessageAsync($"Name: {item.Name}, Description: {item.Description}");
 		}
@@ -55,17 +57,17 @@ namespace DiscordBot.Commands
 			//generate
 			for (int x = 0; x < tiles.GetLength(0); x++)
 				for (int y = 0; y < tiles.GetLength(1); y++)
-                {
+				{
 					// is it possible to add this to the map instead of using a one dimensional collection?
 					tiles[x, y] = new Tile { PosX = x, PosY = y, graphic = "<:powerlich:818391341163348008>" };
 
 					map.Tiles.Add(new Tile { PosX = x, PosY = y, graphic = "<:powerlich:818391341163348008>" });
-                }
+				}
 
 			//print
 			string message = "";
 			for (int x = 0; x < tiles.GetLength(0); x++)
-            {
+			{
 				for (int y = 0; y < tiles.GetLength(1); y++)
 				{
 					message += tiles[x, y].graphic;
@@ -85,6 +87,7 @@ namespace DiscordBot.Commands
 		[Command("createimage")]
 		public async Task CreateImage(CommandContext ctx, int size)
 		{
+
 			int tileWidth = 16;
 			int tileHeight = 16;
 
@@ -95,11 +98,9 @@ namespace DiscordBot.Commands
 			// populate
 			for (int x = 0; x < tiles.GetLength(0); x++)
 				for (int y = 0; y < tiles.GetLength(1); y++)
-                {
+				{
 					tiles[x, y] = image1;
-                }
-
-
+				}
 
 			Bitmap bitmap = new Bitmap(tiles.GetLength(0) * tileWidth, tiles.GetLength(1) * tileHeight);
 			using (Graphics g = Graphics.FromImage(bitmap))
@@ -111,8 +112,15 @@ namespace DiscordBot.Commands
 					}
 			}
 
-			await ctx.Channel.SendMessageAsync("a").ConfigureAwait(false);
+			Stream stream = new MemoryStream();
 
+			bitmap.Save(stream, ImageFormat.Jpeg);
+
+			var message = new DiscordMessageBuilder();
+			message.Content = "Nice map, Gordon";
+			message.WithFile("map.jpeg", stream);
+
+			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
 		}
 	}
 }
