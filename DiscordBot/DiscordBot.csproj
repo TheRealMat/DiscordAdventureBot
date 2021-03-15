@@ -26,9 +26,11 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0-preview.1.21102.12" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1-beta1" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Sprites\" />
     <Folder Include="obj\Debug\netcoreapp3.1\" />
   </ItemGroup>
 

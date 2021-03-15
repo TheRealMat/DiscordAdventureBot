@@ -7,6 +7,8 @@ using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -70,13 +72,46 @@ namespace DiscordBot.Commands
 				}
 				message += Environment.NewLine;
 			}
-
+			message += "test";
 			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
 
 
 
 			//await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
 
+
+		}
+
+		[Command("createimage")]
+		public async Task CreateImage(CommandContext ctx, int size)
+		{
+			int tileWidth = 16;
+			int tileHeight = 16;
+
+			Bitmap image1 = new Bitmap(Image.FromFile(@"Sprites\devtex.bmp"));
+
+			Bitmap[,] tiles = new Bitmap[size, size];
+
+			// populate
+			for (int x = 0; x < tiles.GetLength(0); x++)
+				for (int y = 0; y < tiles.GetLength(1); y++)
+                {
+					tiles[x, y] = image1;
+                }
+
+
+
+			Bitmap bitmap = new Bitmap(tiles.GetLength(0) * tileWidth, tiles.GetLength(1) * tileHeight);
+			using (Graphics g = Graphics.FromImage(bitmap))
+			{
+				for (int x = 0; x < tiles.GetLength(0); x++)
+					for (int y = 0; y < tiles.GetLength(1); y++)
+					{
+						g.DrawImage(tiles[x, y], x * tileWidth, y * tileHeight);
+					}
+			}
+
+			await ctx.Channel.SendMessageAsync("a").ConfigureAwait(false);
 
 		}
 	}
