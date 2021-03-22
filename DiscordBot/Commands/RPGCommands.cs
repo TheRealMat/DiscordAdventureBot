@@ -76,8 +76,10 @@ namespace DiscordBot.Commands
 			message += "test";
 			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
 
-			//await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
+			await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
 		}
+
+
 
 		[Command("createimage")]
 		public async Task CreateImage(CommandContext ctx, int size = 5)

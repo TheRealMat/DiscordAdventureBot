@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DiscordBot.Models
 {
-    public class Map
+    public class Map : Entity
     {
         public Map()
         {
