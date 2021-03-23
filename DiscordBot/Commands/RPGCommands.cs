@@ -57,7 +57,7 @@ namespace DiscordBot.Commands
 			for (int x = 0; x < tiles.GetLength(0); x++)
 				for (int y = 0; y < tiles.GetLength(1); y++)
 				{
-					map.Tiles.Add(new Tile { PosX = x, PosY = y, Graphic = "<:powerlich:818391341163348008>" });
+					map.Tiles.Add(new Tile { PosX = x, PosY = y, Graphic = @"Sprites\devtex.bmp" });
 				}
 
 			await ctx.Channel.SendMessageAsync("map created").ConfigureAwait(false);
