@@ -81,14 +81,13 @@ namespace DiscordBot.Commands
 		[Command("gettiles")]
 		public async Task GetTiles(CommandContext ctx, int xMin, int xMax, int yMin, int yMax)
 		{
-			// this gets a lot of wrong stuff if min is more than 0
 			Tile[] tiles = await _mapService.GetTilesByConstraint(xMin, xMax, yMin, yMax);
-			Tile[,] tiles2d = new Tile[xMax+1, yMax+1];
+			Tile[,] tiles2d = new Tile[xMax - xMin + 1, yMax - yMin +1];
 
 			// array to 2d array
 			foreach (Tile tile in tiles)
             {
-				tiles2d[tile.PosX, tile.PosY] = tile;
+				tiles2d[tile.PosX - xMin, tile.PosY - yMin] = tile;
             }
 			Bitmap bitmap = CreateImage(tiles2d);
 			Stream stream = BitmapToStream(bitmap);
