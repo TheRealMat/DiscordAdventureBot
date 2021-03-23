@@ -78,10 +78,34 @@ namespace DiscordBot.Commands
 
 			await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
 		}
+		[Command("gettiles")]
+		public async Task GetTiles(CommandContext ctx, int xMin, int xMax, int yMin, int yMax)
+		{
+			Tile[] tiles = await _mapService.GetTilesByConstraint(xMin, xMax, yMin, yMax);
+			Tile[,] tiles2d = new Tile[xMax+1, yMax+1];
+
+			// array to 2d array
+			foreach (Tile tile in tiles)
+            {
+				tiles2d[tile.PosX, tile.PosY] = tile;
+            }
+
+			//print
+			string message = "";
+			for (int x = xMin; x < xMax; x++)
+			{
+				for (int y = yMin; y < yMax; y++)
+				{
+					message += tiles2d[x, y].Graphic;
+				}
+				message += Environment.NewLine;
+			}
+			message += "test";
+			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
+		}
 
 
-
-		[Command("createimage")]
+			[Command("createimage")]
 		public async Task CreateImage(CommandContext ctx, int size = 5)
 		{
 
