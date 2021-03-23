@@ -9,6 +9,7 @@ namespace DiscordBot.Models
     {
         public int PosX { get; set; }
         public int PosY { get; set; }
-        public string graphic { get; set; }
+        public string Graphic { get; set; }
+        public virtual Map Map { get; set; }
     }
 }

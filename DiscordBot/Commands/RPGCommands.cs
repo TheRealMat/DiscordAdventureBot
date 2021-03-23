@@ -58,9 +58,9 @@ namespace DiscordBot.Commands
 				for (int y = 0; y < tiles.GetLength(1); y++)
 				{
 					// is it possible to add this to the map instead of using a one dimensional collection?
-					tiles[x, y] = new Tile { PosX = x, PosY = y, graphic = "<:powerlich:818391341163348008>" };
+					tiles[x, y] = new Tile { PosX = x, PosY = y, Graphic = "<:powerlich:818391341163348008>" };
 
-					map.Tiles.Add(new Tile { PosX = x, PosY = y, graphic = "<:powerlich:818391341163348008>" });
+					map.Tiles.Add(new Tile { PosX = x, PosY = y, Graphic = "<:powerlich:818391341163348008>" });
 				}
 
 			//print
@@ -69,7 +69,7 @@ namespace DiscordBot.Commands
 			{
 				for (int y = 0; y < tiles.GetLength(1); y++)
 				{
-					message += tiles[x, y].graphic;
+					message += tiles[x, y].Graphic;
 				}
 				message += Environment.NewLine;
 			}
