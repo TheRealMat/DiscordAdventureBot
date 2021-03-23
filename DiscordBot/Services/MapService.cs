@@ -10,6 +10,8 @@ namespace DiscordBot.Services
     public interface IMapService
     {
         Task CreateNewMapAsync(Map map);
+        Task<Tile> GetTileByCoords(int CoordX, int CoordY);
+        Task<Tile[]> GetTilesByConstraint(int xMin, int xMax, int yMin, int yMax);
     }
     public class MapService : IMapService
     {
