@@ -57,27 +57,14 @@ namespace DiscordBot.Commands
 			for (int x = 0; x < tiles.GetLength(0); x++)
 				for (int y = 0; y < tiles.GetLength(1); y++)
 				{
-					// is it possible to add this to the map instead of using a one dimensional collection?
-					tiles[x, y] = new Tile { PosX = x, PosY = y, Graphic = "<:powerlich:818391341163348008>" };
-
 					map.Tiles.Add(new Tile { PosX = x, PosY = y, Graphic = "<:powerlich:818391341163348008>" });
 				}
 
-			//print
-			string message = "";
-			for (int x = 0; x < tiles.GetLength(0); x++)
-			{
-				for (int y = 0; y < tiles.GetLength(1); y++)
-				{
-					message += tiles[x, y].Graphic;
-				}
-				message += Environment.NewLine;
-			}
-			message += "test";
-			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
+			await ctx.Channel.SendMessageAsync("map created").ConfigureAwait(false);
 
 			await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
 		}
+
 		[Command("gettiles")]
 		public async Task GetTiles(CommandContext ctx, int xMin, int xMax, int yMin, int yMax)
 		{
