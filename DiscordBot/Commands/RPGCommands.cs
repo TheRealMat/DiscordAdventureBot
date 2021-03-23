@@ -81,6 +81,7 @@ namespace DiscordBot.Commands
 		[Command("gettiles")]
 		public async Task GetTiles(CommandContext ctx, int xMin, int xMax, int yMin, int yMax)
 		{
+			// this gets a lot of wrong stuff if min is more than 0
 			Tile[] tiles = await _mapService.GetTilesByConstraint(xMin, xMax, yMin, yMax);
 			Tile[,] tiles2d = new Tile[xMax+1, yMax+1];
 
@@ -89,50 +90,31 @@ namespace DiscordBot.Commands
             {
 				tiles2d[tile.PosX, tile.PosY] = tile;
             }
+			Bitmap bitmap = CreateImage(tiles2d);
+			Stream stream = BitmapToStream(bitmap);
 
-			//print
-			string message = "";
-			for (int x = xMin; x < xMax; x++)
-			{
-				for (int y = yMin; y < yMax; y++)
-				{
-					message += tiles2d[x, y].Graphic;
-				}
-				message += Environment.NewLine;
-			}
-			message += "test";
-			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
+			// Sends the message
+			await new DiscordMessageBuilder()
+				.WithContent("very cool")
+				.WithFile("map.png", stream)
+				.SendAsync(ctx.Channel);
 		}
 
+		public Stream BitmapToStream(Bitmap bitmap)
+        {
+			// Transform bitmap to a byte array
+			ImageConverter converter = new ImageConverter();
+			byte[] bytes = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
 
-			[Command("createimage")]
-		public async Task CreateImage(CommandContext ctx, int size = 5)
+			// Turns the bytearray into a memoryStream. A stream is required to send the message
+			Stream stream = new MemoryStream(bytes);
+			return stream;
+		}
+
+		public Bitmap CreateImage(Tile[,] tiles)
 		{
-
-			// Limits size to 100 (The image can be maximum (100^2 * 16^2) = 2,560,000 pixels. Expected max filesize of 141 kB)
-			size = size > 100 ? 100 : size;
-
 			int tileWidth = 16;
 			int tileHeight = 16;
-
-			Bitmap[] sprites = new Bitmap[] {
-				new Bitmap(Image.FromFile(@"Sprites\devtex.bmp")),
-				new Bitmap(Image.FromFile(@"Sprites\grass.bmp"))
-			};
-
-			var random = new Random();
-
-			Bitmap[,] tiles = new Bitmap[size, size];
-
-			// Populate placeholder map
-			for (int x = 0; x < tiles.GetLength(0); x++)
-				for (int y = 0; y < tiles.GetLength(1); y++)
-				{
-					// Get random image for the tile
-					var rIndex = random.Next(0, sprites.Length);
-
-					tiles[x, y] = sprites[rIndex];
-				}
 
 			// Create the graphical representation of the map based on the tiles
 			Bitmap bitmap = new Bitmap(tiles.GetLength(0) * tileWidth, tiles.GetLength(1) * tileHeight);
@@ -141,22 +123,10 @@ namespace DiscordBot.Commands
 				for (int x = 0; x < tiles.GetLength(0); x++)
 					for (int y = 0; y < tiles.GetLength(1); y++)
 					{
-						g.DrawImage(tiles[x, y], x * tileWidth, y * tileHeight);
+						g.DrawImage(Image.FromFile($@"{tiles[x, y].Graphic}"), x * tileWidth, y * tileHeight);
 					}
 			}
-
-			// Transform bitmap to a byte array
-			ImageConverter converter = new ImageConverter();
-			byte[] bytes = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-
-			// Turns the bytearray into a memoryStream. A stream is required to send the message
-			Stream stream = new MemoryStream(bytes);
-
-			// Sends the message
-			await new DiscordMessageBuilder()
-				.WithContent("Nice map, Gordon")
-				.WithFile("map.png", stream)
-				.SendAsync(ctx.Channel);
+			return bitmap;
 		}
 	}
 }
