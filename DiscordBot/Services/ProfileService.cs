@@ -14,6 +14,8 @@ namespace DiscordBot.Services
     public class ProfileService : IProfileService
     {
         private readonly RPGContext _context;
+        int spawnX = 10;
+        int spawnY = 0;
 
         public ProfileService(RPGContext context)
         {
@@ -33,6 +35,9 @@ namespace DiscordBot.Services
             {
                 DiscordId = discordId
             };
+
+            profile.PosX = spawnX;
+            profile.PosY = spawnY;
 
             _context.Add(profile);
 

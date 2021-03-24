@@ -9,5 +9,7 @@ namespace DiscordBot.Models
     {
         public ulong DiscordId { get; set; }
 
+        public int PosX { get; set; }
+        public int PosY { get; set; }
     }
 }

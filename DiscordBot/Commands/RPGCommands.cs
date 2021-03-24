@@ -20,11 +20,13 @@ namespace DiscordBot.Commands
 	{
 		private readonly IItemService _itemService;
 		private readonly IMapService _mapService;
+		private readonly IProfileService _profileService;
 
-		public RPGCommands(IItemService itemService, IMapService mapService)
+		public RPGCommands(IItemService itemService, IMapService mapService, IProfileService profileService)
 		{
 			_itemService = itemService;
 			_mapService = mapService;
+			_profileService = profileService;
 		}
 
 		[Command("createitem")]
@@ -57,12 +59,23 @@ namespace DiscordBot.Commands
 			for (int x = 0; x < tiles.GetLength(0); x++)
 				for (int y = 0; y < tiles.GetLength(1); y++)
 				{
-					map.Tiles.Add(new Tile { PosX = x, PosY = y, Graphic = @"Sprites\devtex.bmp" });
+					map.Tiles.Add(new Tile { PosX = x, PosY = y, Graphic = @"Sprites\grass.bmp" });
 				}
 
 			await ctx.Channel.SendMessageAsync("map created").ConfigureAwait(false);
 
 			await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
+		}
+		[Command("look")]
+		public async Task Look(CommandContext ctx, int range)
+		{
+			Profile profile = await _profileService.GetOrCreateProfileAsync(ctx.Member.Id).ConfigureAwait(false);
+
+			await GetTiles(ctx, 
+				profile.PosX - range, 
+				profile.PosX + range, 
+				profile.PosY - range, 
+				profile.PosY + range);
 		}
 
 		[Command("gettiles")]
@@ -109,7 +122,14 @@ namespace DiscordBot.Commands
 				for (int x = 0; x < tiles.GetLength(0); x++)
 					for (int y = 0; y < tiles.GetLength(1); y++)
 					{
-						g.DrawImage(Image.FromFile($@"{tiles[x, y].Graphic}"), x * tileWidth, y * tileHeight);
+						if (tiles[x, y] != null)
+                        {
+							g.DrawImage(Image.FromFile($@"{tiles[x, y].Graphic}"), x * tileWidth, y * tileHeight);
+						}
+                        else
+                        {
+							g.DrawImage(Image.FromFile(@"Sprites\devtex.bmp"), x * tileWidth, y * tileHeight);
+						}
 					}
 			}
 			return bitmap;
