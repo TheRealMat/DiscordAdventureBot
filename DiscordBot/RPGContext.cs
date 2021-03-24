@@ -13,5 +13,6 @@ namespace DiscordBot
         public DbSet<Item> Items { get; set; }
         public DbSet<Map> Maps { get; set; }
         public DbSet<Tile> Tiles { get; set; }
+        public DbSet<Profile> Profiles { get; set; }
     }
 }
