@@ -23,9 +23,9 @@ namespace DiscordBot.Commands
 
 		[Command("profile")]
 		public async Task Profile(CommandContext ctx)
-        {
+		{
 			await GetProfileToDisplayAsync(ctx, ctx.Member.Id);
-        }
+		}
 
 		[Command("profile")]
 		public async Task Profile(CommandContext ctx, DiscordMember member)
@@ -34,7 +34,7 @@ namespace DiscordBot.Commands
 		}
 
 		private async Task GetProfileToDisplayAsync(CommandContext ctx, ulong memberId)
-        {
+		{
 			Profile profile = await _profileService.GetOrCreateProfileAsync(memberId).ConfigureAwait(false);
 
 			DiscordMember member = await ctx.Guild.GetMemberAsync(profile.DiscordId).ConfigureAwait(false);
@@ -48,10 +48,11 @@ namespace DiscordBot.Commands
 				Title = $"{member.DisplayName}'s profile",
 				Thumbnail = thumbnail
 			};
+			profileEmbed.AddField("Skills", "Strength: 7\nConstitution: 5\nCrafting: 2"); // just for show
 			profileEmbed.AddField("Status", "😎");
 
 			await ctx.Channel.SendMessageAsync(embed: profileEmbed).ConfigureAwait(false);
-        }
+		}
 
 	}
 }

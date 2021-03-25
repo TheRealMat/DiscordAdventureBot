@@ -69,7 +69,7 @@ namespace DiscordBot.Commands
 
 		[Command("spawn")]
 		public async Task Spawn(CommandContext ctx)
-        {
+		{
 			Profile profile = await _profileService.GetOrCreateProfileAsync(ctx.Member.Id).ConfigureAwait(false);
 			await Spawn(ctx, profile).ConfigureAwait(false);
 		}
@@ -89,7 +89,8 @@ namespace DiscordBot.Commands
 		public async Task Look(CommandContext ctx, int range, Profile profile)
 		{
 			// Make sure player has a tile
-			if (profile.CurrentTile == null){
+			if (profile.CurrentTile == null)
+			{
 				await Spawn(ctx, profile).ConfigureAwait(false);
 			}
 
@@ -108,30 +109,41 @@ namespace DiscordBot.Commands
 			Profile profile = await _profileService.GetOrCreateProfileAsync(ctx.Member.Id).ConfigureAwait(false);
 
 			// Make sure player has a tile
-			if (profile.CurrentTile == null){
+			if (profile.CurrentTile == null)
+			{
 				await Spawn(ctx, profile).ConfigureAwait(false);
 			}
 
-			Tile tile = null;
-			if(direction == "north")
-            {
-				tile = await _mapService.GetTileByCoords(profile.CurrentTile.PosX, profile.CurrentTile.PosY - 1).ConfigureAwait(false);
-            }
-			else if (direction == "south")
-			{
-				tile = await _mapService.GetTileByCoords(profile.CurrentTile.PosX, profile.CurrentTile.PosY + 1).ConfigureAwait(false);
+			int x, y;
 
-			}
-			else if (direction == "east")
+			switch (direction)
 			{
-				tile = await _mapService.GetTileByCoords(profile.CurrentTile.PosX + 1, profile.CurrentTile.PosY).ConfigureAwait(false);
-			}
-			else if (direction == "west")
-			{
-				tile = await _mapService.GetTileByCoords(profile.CurrentTile.PosX - 1, profile.CurrentTile.PosY).ConfigureAwait(false);
+				case "north":
+					x = profile.CurrentTile.PosX;
+					y = profile.CurrentTile.PosY - 1;
+					break;
+				case "south":
+
+					x = profile.CurrentTile.PosX;
+					y = profile.CurrentTile.PosY + 1;
+					break;
+				case "east":
+
+					x = profile.CurrentTile.PosX + 1;
+					y = profile.CurrentTile.PosY;
+					break;
+				case "west":
+					x = profile.CurrentTile.PosX - 1;
+					y = profile.CurrentTile.PosY;
+					break;
+				default:
+					return;
 			}
 
-			if (tile != null){
+			Tile tile = await _mapService.GetTileByCoords(x, y).ConfigureAwait(false);
+
+			if (tile != null)
+			{
 				await _mapService.SetPositionAsync(profile, tile).ConfigureAwait(false);
 			}
 
@@ -142,25 +154,30 @@ namespace DiscordBot.Commands
 		public async Task GetTiles(CommandContext ctx, int xMin, int xMax, int yMin, int yMax)
 		{
 			Tile[] tiles = await _mapService.GetTilesByConstraint(xMin, xMax, yMin, yMax);
-			Tile[,] tiles2d = new Tile[xMax - xMin + 1, yMax - yMin +1];
+			Tile[,] tiles2d = new Tile[xMax - xMin + 1, yMax - yMin + 1];
 
 			// array to 2d array
 			foreach (Tile tile in tiles)
-            {
+			{
 				tiles2d[tile.PosX - xMin, tile.PosY - yMin] = tile;
-            }
+			}
 			Bitmap bitmap = CreateImage(tiles2d);
 			Stream stream = BitmapToStream(bitmap);
 
+			var startTime = ctx.Message.CreationTimestamp.UtcDateTime;
+			TimeSpan ts = DateTime.UtcNow.Subtract(startTime);
+			string elapsedTime = String.Format("{0:00}.{1:00} seconds", ts.Seconds, ts.Milliseconds / 10);
+			string message = $"Took: {elapsedTime}";
+
 			// Sends the message
 			await new DiscordMessageBuilder()
-				.WithContent("very cool")
+				.WithContent(message)
 				.WithFile("map.png", stream)
 				.SendAsync(ctx.Channel);
 		}
 
 		public Stream BitmapToStream(Bitmap bitmap)
-        {
+		{
 			// Transform bitmap to a byte array
 			ImageConverter converter = new ImageConverter();
 			byte[] bytes = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
@@ -183,11 +200,11 @@ namespace DiscordBot.Commands
 					for (int y = 0; y < tiles.GetLength(1); y++)
 					{
 						if (tiles[x, y] != null)
-                        {
+						{
 							g.DrawImage(Image.FromFile($@"{tiles[x, y].Graphic}"), x * tileWidth, y * tileHeight);
 						}
-                        else
-                        {
+						else
+						{
 							g.DrawImage(Image.FromFile(@"Sprites\devtex.bmp"), x * tileWidth, y * tileHeight);
 						}
 					}
