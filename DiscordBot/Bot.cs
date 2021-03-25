@@ -14,7 +14,7 @@ namespace DiscordBot
 		public CommandsNextExtension Commands { get; private set; }
 
 		public Bot(IServiceProvider services)
-        {
+		{
 			var config = Config.Instance;
 
 			client = new DiscordClient(new DiscordConfiguration
@@ -41,6 +41,7 @@ namespace DiscordBot
 			Commands.RegisterCommands<RPGCommands>();
 
 			client.ConnectAsync();
+			AppDomain.CurrentDomain.ProcessExit += Disconnect;
 		}
 
 
@@ -48,5 +49,11 @@ namespace DiscordBot
 		{
 			return Task.CompletedTask;
 		}
+
+		public void Disconnect(object sender, EventArgs e)
+		{
+			client.DisconnectAsync();
+		}
+
 	}
 }
