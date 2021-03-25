@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace DiscordBot.Services
     public interface IProfileService
     {
         Task<Profile> GetOrCreateProfileAsync(ulong discordId);
+        Task SetPositionAsync(Profile profile, int PosX, int PosY);
     }
     public class ProfileService : IProfileService
     {
@@ -44,6 +46,19 @@ namespace DiscordBot.Services
             await _context.SaveChangesAsync().ConfigureAwait(false);
 
             return profile;
+        }
+
+        public async Task SetPositionAsync(Profile profile, int PosX, int PosY)
+        {
+            profile.PosX = PosX;
+            profile.PosY = PosY;
+
+            _context.Update(profile);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
+            // This is neccesary to prevent an exception on next Update
+            _context.Entry(profile).State = EntityState.Detached;
+
+            return;
         }
     }
 }

@@ -78,6 +78,32 @@ namespace DiscordBot.Commands
 				profile.PosY + range);
 		}
 
+		// replace this with rections
+		[Command("go")]
+		public async Task Go(CommandContext ctx, string direction)
+		{
+			Profile profile = await _profileService.GetOrCreateProfileAsync(ctx.Member.Id).ConfigureAwait(false);
+			
+			if(direction == "north")
+            {
+				await _profileService.SetPositionAsync(profile, profile.PosX, profile.PosY - 1).ConfigureAwait(false);
+            }
+			else if (direction == "south")
+			{
+				await _profileService.SetPositionAsync(profile, profile.PosX, profile.PosY + 1).ConfigureAwait(false);
+			}
+			else if (direction == "east")
+			{
+				await _profileService.SetPositionAsync(profile, profile.PosX + 1, profile.PosY).ConfigureAwait(false);
+			}
+			else if (direction == "west")
+			{
+				await _profileService.SetPositionAsync(profile, profile.PosX - 1, profile.PosY).ConfigureAwait(false);
+			}
+			
+			await Look(ctx, 5);
+		}
+
 		[Command("gettiles")]
 		public async Task GetTiles(CommandContext ctx, int xMin, int xMax, int yMin, int yMax)
 		{
