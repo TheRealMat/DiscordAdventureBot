@@ -51,7 +51,7 @@ namespace DiscordBot
 			return Task.CompletedTask;
 		}
 
-		public void Disconnect(object sender, EventArgs e)
+		private void Disconnect(object sender, EventArgs e)
 		{
 			client.DisconnectAsync();
 		}
