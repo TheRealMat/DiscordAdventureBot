@@ -20,11 +20,13 @@ namespace DiscordBot.Commands
 	{
 		private readonly IItemService _itemService;
 		private readonly IMapService _mapService;
+		private readonly IProfileService _profileService;
 
-		public RPGCommands(IItemService itemService, IMapService mapService)
+		public RPGCommands(IItemService itemService, IMapService mapService, IProfileService profileService)
 		{
 			_itemService = itemService;
 			_mapService = mapService;
+			_profileService = profileService;
 		}
 
 		[Command("createitem")]
@@ -57,56 +59,87 @@ namespace DiscordBot.Commands
 			for (int x = 0; x < tiles.GetLength(0); x++)
 				for (int y = 0; y < tiles.GetLength(1); y++)
 				{
-					// is it possible to add this to the map instead of using a one dimensional collection?
-					tiles[x, y] = new Tile { PosX = x, PosY = y, graphic = "<:powerlich:818391341163348008>" };
-
-					map.Tiles.Add(new Tile { PosX = x, PosY = y, graphic = "<:powerlich:818391341163348008>" });
+					map.Tiles.Add(new Tile { PosX = x, PosY = y, Graphic = @"Sprites\grass.bmp" });
 				}
 
-			//print
-			string message = "";
-			for (int x = 0; x < tiles.GetLength(0); x++)
-			{
-				for (int y = 0; y < tiles.GetLength(1); y++)
-				{
-					message += tiles[x, y].graphic;
-				}
-				message += Environment.NewLine;
-			}
-			message += "test";
-			await ctx.Channel.SendMessageAsync(message).ConfigureAwait(false);
+			await ctx.Channel.SendMessageAsync("map created").ConfigureAwait(false);
 
-			//await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
+			await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
+		}
+		[Command("look")]
+		public async Task Look(CommandContext ctx, int range)
+		{
+			Profile profile = await _profileService.GetOrCreateProfileAsync(ctx.Member.Id).ConfigureAwait(false);
+
+			await GetTiles(ctx, 
+				profile.PosX - range, 
+				profile.PosX + range, 
+				profile.PosY - range, 
+				profile.PosY + range);
 		}
 
-		[Command("createimage")]
-		public async Task CreateImage(CommandContext ctx, int size = 5)
+		// replace this with rections
+		[Command("go")]
+		public async Task Go(CommandContext ctx, string direction)
 		{
+			Profile profile = await _profileService.GetOrCreateProfileAsync(ctx.Member.Id).ConfigureAwait(false);
+			
+			if(direction == "north")
+            {
+				await _profileService.SetPositionAsync(profile, profile.PosX, profile.PosY - 1).ConfigureAwait(false);
+            }
+			else if (direction == "south")
+			{
+				await _profileService.SetPositionAsync(profile, profile.PosX, profile.PosY + 1).ConfigureAwait(false);
+			}
+			else if (direction == "east")
+			{
+				await _profileService.SetPositionAsync(profile, profile.PosX + 1, profile.PosY).ConfigureAwait(false);
+			}
+			else if (direction == "west")
+			{
+				await _profileService.SetPositionAsync(profile, profile.PosX - 1, profile.PosY).ConfigureAwait(false);
+			}
+			
+			await Look(ctx, 5);
+		}
 
-			// Limits size to 100 (The image can be maximum (100^2 * 16^2) = 2,560,000 pixels. Expected max filesize of 141 kB)
-			size = size > 100 ? 100 : size;
+		[Command("gettiles")]
+		public async Task GetTiles(CommandContext ctx, int xMin, int xMax, int yMin, int yMax)
+		{
+			Tile[] tiles = await _mapService.GetTilesByConstraint(xMin, xMax, yMin, yMax);
+			Tile[,] tiles2d = new Tile[xMax - xMin + 1, yMax - yMin +1];
 
+			// array to 2d array
+			foreach (Tile tile in tiles)
+            {
+				tiles2d[tile.PosX - xMin, tile.PosY - yMin] = tile;
+            }
+			Bitmap bitmap = CreateImage(tiles2d);
+			Stream stream = BitmapToStream(bitmap);
+
+			// Sends the message
+			await new DiscordMessageBuilder()
+				.WithContent("very cool")
+				.WithFile("map.png", stream)
+				.SendAsync(ctx.Channel);
+		}
+
+		public Stream BitmapToStream(Bitmap bitmap)
+        {
+			// Transform bitmap to a byte array
+			ImageConverter converter = new ImageConverter();
+			byte[] bytes = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
+
+			// Turns the bytearray into a memoryStream. A stream is required to send the message
+			Stream stream = new MemoryStream(bytes);
+			return stream;
+		}
+
+		public Bitmap CreateImage(Tile[,] tiles)
+		{
 			int tileWidth = 16;
 			int tileHeight = 16;
-
-			Bitmap[] sprites = new Bitmap[] {
-				new Bitmap(Image.FromFile(@"Sprites\devtex.bmp")),
-				new Bitmap(Image.FromFile(@"Sprites\grass.bmp"))
-			};
-
-			var random = new Random();
-
-			Bitmap[,] tiles = new Bitmap[size, size];
-
-			// Populate placeholder map
-			for (int x = 0; x < tiles.GetLength(0); x++)
-				for (int y = 0; y < tiles.GetLength(1); y++)
-				{
-					// Get random image for the tile
-					var rIndex = random.Next(0, sprites.Length);
-
-					tiles[x, y] = sprites[rIndex];
-				}
 
 			// Create the graphical representation of the map based on the tiles
 			Bitmap bitmap = new Bitmap(tiles.GetLength(0) * tileWidth, tiles.GetLength(1) * tileHeight);
@@ -115,22 +148,17 @@ namespace DiscordBot.Commands
 				for (int x = 0; x < tiles.GetLength(0); x++)
 					for (int y = 0; y < tiles.GetLength(1); y++)
 					{
-						g.DrawImage(tiles[x, y], x * tileWidth, y * tileHeight);
+						if (tiles[x, y] != null)
+                        {
+							g.DrawImage(Image.FromFile($@"{tiles[x, y].Graphic}"), x * tileWidth, y * tileHeight);
+						}
+                        else
+                        {
+							g.DrawImage(Image.FromFile(@"Sprites\devtex.bmp"), x * tileWidth, y * tileHeight);
+						}
 					}
 			}
-
-			// Transform bitmap to a byte array
-			ImageConverter converter = new ImageConverter();
-			byte[] bytes = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-
-			// Turns the bytearray into a memoryStream. A stream is required to send the message
-			Stream stream = new MemoryStream(bytes);
-
-			// Sends the message
-			await new DiscordMessageBuilder()
-				.WithContent("Nice map, Gordon")
-				.WithFile("map.png", stream)
-				.SendAsync(ctx.Channel);
+			return bitmap;
 		}
 	}
 }

@@ -30,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Sprites\" />
     <Folder Include="obj\Debug\netcoreapp3.1\" />
   </ItemGroup>
 

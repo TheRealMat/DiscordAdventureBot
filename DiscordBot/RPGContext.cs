@@ -11,7 +11,8 @@ namespace DiscordBot
     {
         public RPGContext(DbContextOptions<RPGContext> options) : base(options) { }
         public DbSet<Item> Items { get; set; }
-        public DbSet<Map> maps { get; set; }
-        public DbSet<Tile> tiles { get; set; }
+        public DbSet<Map> Maps { get; set; }
+        public DbSet<Tile> Tiles { get; set; }
+        public DbSet<Profile> Profiles { get; set; }
     }
 }

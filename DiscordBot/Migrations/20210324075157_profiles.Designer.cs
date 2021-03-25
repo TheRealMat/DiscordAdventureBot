@@ -4,14 +4,16 @@ using DiscordBot;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DiscordBot.Migrations
 {
     [DbContext(typeof(RPGContext))]
-    partial class RPGContextModelSnapshot : ModelSnapshot
+    [Migration("20210324075157_profiles")]
+    partial class profiles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,12 +60,6 @@ namespace DiscordBot.Migrations
 
                     b.Property<decimal>("DiscordId")
                         .HasColumnType("decimal(20,0)");
-
-                    b.Property<int>("PosX")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PosY")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

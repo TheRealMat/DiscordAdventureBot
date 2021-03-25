@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace DiscordBot.Models
 {
-    public class Tile : Entity
+    public class Profile : Entity
     {
+        public ulong DiscordId { get; set; }
+
         public int PosX { get; set; }
         public int PosY { get; set; }
-        public string Graphic { get; set; }
-        public virtual Map Map { get; set; }
     }
 }

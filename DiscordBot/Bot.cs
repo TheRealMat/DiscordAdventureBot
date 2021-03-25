@@ -39,6 +39,7 @@ namespace DiscordBot
 			Commands = client.UseCommandsNext(commandsConfig);
 			Commands.RegisterCommands<TestCommands>();
 			Commands.RegisterCommands<RPGCommands>();
+			Commands.RegisterCommands<ProfileCommands>();
 
 			client.ConnectAsync();
 			AppDomain.CurrentDomain.ProcessExit += Disconnect;
