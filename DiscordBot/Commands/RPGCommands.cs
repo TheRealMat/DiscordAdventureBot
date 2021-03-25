@@ -116,7 +116,7 @@ namespace DiscordBot.Commands
 
 			int x, y;
 
-			switch (direction)
+			switch (direction.ToLower())
 			{
 				case "north":
 				case "n":
