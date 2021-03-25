@@ -119,34 +119,39 @@ namespace DiscordBot.Commands
 			switch (direction)
 			{
 				case "north":
+				case "n":
 					x = profile.CurrentTile.PosX;
 					y = profile.CurrentTile.PosY - 1;
 					break;
 				case "south":
-
+				case "s":
 					x = profile.CurrentTile.PosX;
 					y = profile.CurrentTile.PosY + 1;
 					break;
 				case "east":
-
+				case "e":
 					x = profile.CurrentTile.PosX + 1;
 					y = profile.CurrentTile.PosY;
 					break;
 				case "west":
+				case "w":
 					x = profile.CurrentTile.PosX - 1;
 					y = profile.CurrentTile.PosY;
 					break;
-				default:
+				default: // Invalid direction, so we exit
 					return;
 			}
 
+			// Gets the tile the player is standing on
 			Tile tile = await _mapService.GetTileByCoords(x, y).ConfigureAwait(false);
 
+			// Updates the players position
 			if (tile != null)
 			{
 				await _mapService.SetPositionAsync(profile, tile).ConfigureAwait(false);
 			}
 
+			// This method shows the surrounding area around the player
 			await Look(ctx, 5, profile).ConfigureAwait(false);
 		}
 
@@ -164,6 +169,7 @@ namespace DiscordBot.Commands
 			Bitmap bitmap = CreateImage(tiles2d);
 			Stream stream = BitmapToStream(bitmap);
 
+			// Times the execution of the command
 			var startTime = ctx.Message.CreationTimestamp.UtcDateTime;
 			TimeSpan ts = DateTime.UtcNow.Subtract(startTime);
 			string elapsedTime = String.Format("{0:00}.{1:00} seconds", ts.Seconds, ts.Milliseconds / 10);
