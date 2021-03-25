@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace DiscordBot.Models
 {
-    public class Profile : TileEntity
+    public class TileEntity : Entity
     {
-        public ulong DiscordId { get; set; }
+        public string Graphic { get; set; }
+        public Tile CurrentTile { get; set; }
     }
 }

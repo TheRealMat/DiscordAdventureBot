@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DiscordBot.Migrations
 {
     [DbContext(typeof(RPGContext))]
-    [Migration("20210324075157_profiles")]
-    partial class profiles
+    [Migration("20210325111742_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -51,21 +51,6 @@ namespace DiscordBot.Migrations
                     b.ToTable("Maps");
                 });
 
-            modelBuilder.Entity("DiscordBot.Models.Profile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<decimal>("DiscordId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Profiles");
-                });
-
             modelBuilder.Entity("DiscordBot.Models.Tile", b =>
                 {
                     b.Property<int>("Id")
@@ -92,6 +77,42 @@ namespace DiscordBot.Migrations
                     b.ToTable("Tiles");
                 });
 
+            modelBuilder.Entity("DiscordBot.Models.TileEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("CurrentTileId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Graphic")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrentTileId");
+
+                    b.ToTable("TileEntities");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("TileEntity");
+                });
+
+            modelBuilder.Entity("DiscordBot.Models.Profile", b =>
+                {
+                    b.HasBaseType("DiscordBot.Models.TileEntity");
+
+                    b.Property<decimal>("DiscordId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.HasDiscriminator().HasValue("Profile");
+                });
+
             modelBuilder.Entity("DiscordBot.Models.Tile", b =>
                 {
                     b.HasOne("DiscordBot.Models.Map", "Map")
@@ -101,9 +122,23 @@ namespace DiscordBot.Migrations
                     b.Navigation("Map");
                 });
 
+            modelBuilder.Entity("DiscordBot.Models.TileEntity", b =>
+                {
+                    b.HasOne("DiscordBot.Models.Tile", "CurrentTile")
+                        .WithMany("TileEntities")
+                        .HasForeignKey("CurrentTileId");
+
+                    b.Navigation("CurrentTile");
+                });
+
             modelBuilder.Entity("DiscordBot.Models.Map", b =>
                 {
                     b.Navigation("Tiles");
+                });
+
+            modelBuilder.Entity("DiscordBot.Models.Tile", b =>
+                {
+                    b.Navigation("TileEntities");
                 });
 #pragma warning restore 612, 618
         }

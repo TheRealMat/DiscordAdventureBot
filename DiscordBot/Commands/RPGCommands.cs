@@ -66,42 +66,76 @@ namespace DiscordBot.Commands
 
 			await _mapService.CreateNewMapAsync(map).ConfigureAwait(false);
 		}
+
+		[Command("spawn")]
+		public async Task Spawn(CommandContext ctx)
+        {
+			Profile profile = await _profileService.GetOrCreateProfileAsync(ctx.Member.Id).ConfigureAwait(false);
+			await Spawn(ctx, profile).ConfigureAwait(false);
+		}
+		public async Task Spawn(CommandContext ctx, Profile profile)
+		{
+			Tile tile = await _mapService.GetTileByCoords(0, 0).ConfigureAwait(false);
+			await _mapService.SetPositionAsync(profile, tile).ConfigureAwait(false);
+		}
+
 		[Command("look")]
 		public async Task Look(CommandContext ctx, int range)
 		{
 			Profile profile = await _profileService.GetOrCreateProfileAsync(ctx.Member.Id).ConfigureAwait(false);
 
-			await GetTiles(ctx, 
-				profile.PosX - range, 
-				profile.PosX + range, 
-				profile.PosY - range, 
-				profile.PosY + range);
+			await Look(ctx, range, profile).ConfigureAwait(false);
+		}
+		public async Task Look(CommandContext ctx, int range, Profile profile)
+		{
+			// Make sure player has a tile
+			if (profile.CurrentTile == null){
+				await Spawn(ctx, profile).ConfigureAwait(false);
+			}
+
+			await GetTiles(ctx,
+				profile.CurrentTile.PosX - range,
+				profile.CurrentTile.PosX + range,
+				profile.CurrentTile.PosY - range,
+				profile.CurrentTile.PosY + range)
+				.ConfigureAwait(false);
 		}
 
-		// replace this with rections
+		// replace this with reactions
 		[Command("go")]
 		public async Task Go(CommandContext ctx, string direction)
 		{
 			Profile profile = await _profileService.GetOrCreateProfileAsync(ctx.Member.Id).ConfigureAwait(false);
-			
+
+			// Make sure player has a tile
+			if (profile.CurrentTile == null){
+				await Spawn(ctx, profile).ConfigureAwait(false);
+			}
+
+			Tile tile = null;
 			if(direction == "north")
             {
-				await _profileService.SetPositionAsync(profile, profile.PosX, profile.PosY - 1).ConfigureAwait(false);
+				tile = await _mapService.GetTileByCoords(profile.CurrentTile.PosX, profile.CurrentTile.PosY - 1).ConfigureAwait(false);
             }
 			else if (direction == "south")
 			{
-				await _profileService.SetPositionAsync(profile, profile.PosX, profile.PosY + 1).ConfigureAwait(false);
+				tile = await _mapService.GetTileByCoords(profile.CurrentTile.PosX, profile.CurrentTile.PosY + 1).ConfigureAwait(false);
+
 			}
 			else if (direction == "east")
 			{
-				await _profileService.SetPositionAsync(profile, profile.PosX + 1, profile.PosY).ConfigureAwait(false);
+				tile = await _mapService.GetTileByCoords(profile.CurrentTile.PosX + 1, profile.CurrentTile.PosY).ConfigureAwait(false);
 			}
 			else if (direction == "west")
 			{
-				await _profileService.SetPositionAsync(profile, profile.PosX - 1, profile.PosY).ConfigureAwait(false);
+				tile = await _mapService.GetTileByCoords(profile.CurrentTile.PosX - 1, profile.CurrentTile.PosY).ConfigureAwait(false);
 			}
-			
-			await Look(ctx, 5);
+
+			if (tile != null){
+				await _mapService.SetPositionAsync(profile, tile).ConfigureAwait(false);
+			}
+
+			await Look(ctx, 5, profile).ConfigureAwait(false);
 		}
 
 		[Command("gettiles")]

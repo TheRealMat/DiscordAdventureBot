@@ -12,6 +12,7 @@ namespace DiscordBot.Services
         Task CreateNewMapAsync(Map map);
         Task<Tile> GetTileByCoords(int CoordX, int CoordY);
         Task<Tile[]> GetTilesByConstraint(int xMin, int xMax, int yMin, int yMax);
+        Task SetPositionAsync(TileEntity entity, Tile tile);
     }
     public class MapService : IMapService
     {
@@ -38,6 +39,21 @@ namespace DiscordBot.Services
             var data = _context.Tiles.Where(tile => tile.PosX >= xMin && tile.PosX <= xMax && tile.PosY >= yMin && tile.PosY <= yMax);
             Tile[] arr = await data.ToArrayAsync();
             return arr;
+        }
+
+
+        public async Task SetPositionAsync(TileEntity entity, Tile tile)
+        {
+            entity.CurrentTile = tile;
+
+            _context.Update(entity);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
+
+            // This is neccesary to prevent an exception on next Update
+            _context.Entry(entity).State = EntityState.Detached;
+            _context.Entry(tile).State = EntityState.Detached;
+
+            return;
         }
     }
 }

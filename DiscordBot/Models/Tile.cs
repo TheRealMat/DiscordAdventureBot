@@ -10,6 +10,7 @@ namespace DiscordBot.Models
         public int PosX { get; set; }
         public int PosY { get; set; }
         public string Graphic { get; set; }
+        public virtual ICollection<TileEntity> TileEntities { get; set; }
         public virtual Map Map { get; set; }
     }
 }

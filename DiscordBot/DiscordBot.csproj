@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations\" />
     <Folder Include="obj\Debug\netcoreapp3.1\" />
   </ItemGroup>
 
